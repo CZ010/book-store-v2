@@ -1,5 +1,4 @@
 import React from "react";
-import "./App.css";
 import {BrowserRouter as Router, Route, Switch,} from "react-router-dom";
 import {Box, Container, CssBaseline} from "@material-ui/core";
 import Header from "./Components/Header/Header";
