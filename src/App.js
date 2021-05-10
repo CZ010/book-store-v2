@@ -1,5 +1,5 @@
 import React from "react";
-import './App.css';
+import "./App.css";
 import {BrowserRouter as Router, Route, Switch,} from "react-router-dom";
 import {Box, Container, CssBaseline} from "@material-ui/core";
 import Header from "./Components/Header/Header";
@@ -17,31 +17,31 @@ function App() {
     <Router>
       <CssBaseline/>
       <Header/>
-      <Container maxWidth='false'>
+      <Container maxWidth={false}>
         <Box mt={12}>
           <Switch>
-            <Route path='/' exact>
+            <Route path="/" exact>
               <Home/>
             </Route>
-            <Route path='/shop'>
+            <Route path="/shop">
               <Shop/>
             </Route>
-            <Route path='/about'>
+            <Route path="/about">
               <About/>
             </Route>
-            <Route path='/ourLocation'>
+            <Route path="/ourLocation">
               <OurLocation/>
             </Route>
-            <Route path='/authorization'>
+            <Route path="/authorization">
               <Authorization/>
             </Route>
-            <Route path='/admin'>
+            <Route path="/admin">
               <AdminPanel/>
             </Route>
-            <Route path='/checkout'>
+            <Route path="/checkout">
               <Checkout/>
             </Route>
-            <Route path='*'>
+            <Route path="*">
               <NoMatch/>
             </Route>
           </Switch>
