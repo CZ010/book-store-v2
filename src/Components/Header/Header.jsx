@@ -1,13 +1,17 @@
-import React, {useState} from "react";
+import React, {useContext, useState} from "react";
 import {AppBar, makeStyles, Toolbar, Typography} from "@material-ui/core";
 import {Link} from "react-router-dom";
 import {CartButton, UserButton} from "../../UI-kit/Buttons";
 import {UserMenu} from "../../UI-kit/Menus";
+import {DataContext} from "../../Context/DataContext";
 
 const Header = () => {
   const styles = useStyles();
   const [anchorEl, setAnchorEl] = useState(null);
   const open = Boolean(anchorEl);
+  const {AuthedUser, Logout} = useContext(DataContext);
+  const [user] = AuthedUser;
+  const [logout] = Logout;
 
   const handleMenuOpen = (event) => {
     setAnchorEl(event.currentTarget);
@@ -16,6 +20,7 @@ const Header = () => {
   const handleMenuClose = () => {
     setAnchorEl(null);
   };
+
   return (
     <>
       <AppBar color="primary" position="fixed" className={styles.root}>
@@ -29,52 +34,65 @@ const Header = () => {
           </Link>
           <Toolbar className={styles.navbar}>
             <Typography>
-              <Link className={styles.link} to="/">
+              <Link className={styles.navLink} to="/">
                 Главная
               </Link>
 
-              <Link className={styles.link} to="/shop">
+              <Link className={styles.navLink} to="/shop">
                 Магазин
               </Link>
 
-              <Link className={styles.link} to="/about">
+              <Link className={styles.navLink} to="/about">
                 О нас
               </Link>
 
-              <Link className={styles.link} to="/ourLocation">
+              <Link className={styles.navLink} to="/ourLocation">
                 Наши магазины
               </Link>
 
-              <Link className={styles.link} to="/admin">
+              <Link className={styles.navLink} to="/admin">
                 Админ панель
               </Link>
             </Typography>
-            <Toolbar>
-              <div>
-                <CartButton className={styles.cart} badgeContent={2}/>
-              </div>
+            {
+              user ? (
+                <Toolbar>
+                  <div>
+                    <CartButton className={styles.cart} badgeContent={2}/>
+                  </div>
 
-              <div>
-                <UserButton className={styles.user} onClick={handleMenuOpen}/>
-                <UserMenu anchorEl={anchorEl}
-                          open={open}
-                          onClose={handleMenuClose}
-                          logOut={() => {
-                            console.log("logout!");
-                          }}
-                />
-              </div>
-            </Toolbar>
-            {/*<div className="login-link-box">*/}
-            {/*  <Typography>*/}
-            {/*    <Link*/}
-            {/*      className="login-link nav-list-item-link"*/}
-            {/*      to="/authorization"*/}
-            {/*    >*/}
-            {/*      Войти*/}
-            {/*    </Link>*/}
-            {/*  </Typography>*/}
-            {/*</div>*/}
+                  <div>
+                    <UserButton className={styles.user} onClick={handleMenuOpen}/>
+                    <UserMenu anchorEl={anchorEl}
+                              open={open}
+                              onClose={handleMenuClose}
+                              logOut={() => {
+                                logout();
+                              }}
+                    />
+                  </div>
+                </Toolbar>
+              ) : (
+                <Toolbar>
+                  <Typography>
+                    <Link
+                      className={styles.link}
+                      to="/authorization"
+                    >
+                      Войти
+                    </Link>
+                  </Typography>
+                  <Typography>
+                    <Link
+                      className={styles.link}
+                      to="/registration"
+                    >
+                      Регистрация
+                    </Link>
+                  </Typography>
+                </Toolbar>
+              )
+            }
           </Toolbar>
         </Toolbar>
       </AppBar>
@@ -101,13 +119,22 @@ const useStyles = makeStyles(() => ({
     justifyContent: "space-between",
     alignItems: "center"
   },
-  link: {
+  navLink: {
     color: "#fff",
     marginLeft: "15px",
     padding: "10px",
     borderRadius: "5px",
     "&:hover": {
       background: "#4791db",
+    }
+  },
+  link: {
+    color: "#fff",
+    marginLeft: "15px",
+    padding: "10px",
+    borderRadius: "5px",
+    "&:hover": {
+      background: "#4caf50",
     }
   },
   user: {
