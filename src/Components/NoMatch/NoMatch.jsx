@@ -1,9 +1,10 @@
-import React from 'react';
+import React from "react";
+import {Typography} from "@material-ui/core";
 
 const NoMatch = () => {
   return (
     <>
-
+      <Typography variant={"h1"}>404</Typography>
     </>
   );
 };
