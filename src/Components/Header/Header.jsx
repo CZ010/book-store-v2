@@ -51,7 +51,7 @@ const Header = () => {
             </Typography>
             <Toolbar>
               <div>
-                <CartButton badgeContent={2}/>
+                <CartButton className={styles.cart} badgeContent={2}/>
               </div>
 
               <div>
@@ -106,14 +106,20 @@ const useStyles = makeStyles(() => ({
     marginLeft: "15px",
     padding: "10px",
     borderRadius: "5px",
-    transition: "all 0.3s ease",
     "&:hover": {
-      color: "#2c3e50",
-      background: "#fff",
+      background: "#4791db",
     }
   },
   user: {
-    marginLeft: "10px"
+    marginLeft: "10px",
+    "&:hover": {
+      color: "#4791db",
+    }
+  },
+  cart: {
+    "&:hover": {
+      color: "#4791db",
+    }
   }
 }));
 
