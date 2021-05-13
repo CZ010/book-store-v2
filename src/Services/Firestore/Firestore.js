@@ -25,7 +25,7 @@ export const getRolesCollection = async () => {
 export const setUserDocument = async (data) => {
   const ID = uuid();
   const createDate = Date.now();
-  const userEmailValid = await getUserByEmail(data.email);
+  const userEmailValid = await checkUserByEmail(data.email);
 
   if (!userEmailValid) {
     db.collection("users").doc(ID).set({
@@ -49,23 +49,26 @@ export const setUserDocument = async (data) => {
   }
 };
 
-export const auth = async (data) => {
-  const user = await getUserByEmail(data.email);
-  if (user) {
-    return user.password === data.password ? user : false;
-  } else {
-    return false;
-  }
+export const getUserByEmailAndPassword = async (data) => {
+  const usersRef = await db.collection("users")
+    .where("email", "==", data.email)
+    .where("password", "==", data.password).get();
+  const users = usersRef.docs.map(doc => doc.data());
+  return users[0];
 };
 
-export const getUserByEmail = async (email) => {
+export const auth = async (data) => {
+  return await getUserByEmailAndPassword(data);
+};
+
+export const checkUserByEmail = async (email) => {
   const usersRef = await db.collection("users")
     .where("email", "==", email).get();
   const users = usersRef.docs.map(doc => doc.data());
   return users.length > 0;
 };
 
-export const getCategoryByTitle = async (title) => {
+export const checkCategoryByTitle = async (title) => {
   const categoriesRef = await db.collection("categories")
     .where("title", "==", title).get();
   const categories = categoriesRef.docs.map(doc => doc.data());
@@ -75,7 +78,7 @@ export const getCategoryByTitle = async (title) => {
 export const setCategoryDocument = async (data) => {
   const ID = uuid();
   const createDate = Date.now();
-  const categoryValid = await getCategoryByTitle(data.title);
+  const categoryValid = await checkCategoryByTitle(data.title);
 
   if (!categoryValid) {
     db.collection("categories").doc(ID).set({
