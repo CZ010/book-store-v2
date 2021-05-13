@@ -13,6 +13,7 @@
     "@testing-library/jest-dom": "^5.12.0",
     "@testing-library/react": "^11.2.6",
     "@testing-library/user-event": "^12.8.3",
+    "file-saver": "^2.0.5",
     "firebase": "^8.5.0",
     "notistack": "^1.0.7",
     "react": "^17.0.2",
