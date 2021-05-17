@@ -25,5 +25,16 @@ export const useNotifications = () => {
     });
   };
 
-  return {Success, Error};
+  const Warning = (message) => {
+    enqueueSnackbar(message, {
+      variant: "warning",
+      anchorOrigin: {
+        vertical: "top",
+        horizontal: "right",
+      },
+      TransitionComponent: Slide,
+    });
+  };
+
+  return {Success, Error, Warning};
 };
