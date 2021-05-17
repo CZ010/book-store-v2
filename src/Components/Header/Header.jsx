@@ -4,14 +4,26 @@ import {Link} from "react-router-dom";
 import {CartButton, UserButton} from "../../UI-kit/Buttons";
 import {UserMenu} from "../../UI-kit/Menus";
 import {DataContext} from "../../Context/DataContext";
+import CartModal from "../../UI-kit/Modals/CartModal/CartModal";
 
 const Header = () => {
   const styles = useStyles();
   const [anchorEl, setAnchorEl] = useState(null);
   const open = Boolean(anchorEl);
-  const {AuthedUser, Logout} = useContext(DataContext);
+  const {AuthedUser, Logout, ShoppingCart} = useContext(DataContext);
   const [user] = AuthedUser;
   const [logout] = Logout;
+  const [cart] = ShoppingCart;
+
+  const [modalOpen, setModalOpen] = useState(false);
+
+  const handleModalOpen = () => {
+    setModalOpen(true);
+  };
+
+  const handleModalClose = () => {
+    setModalOpen(false);
+  };
 
   const handleMenuOpen = (event) => {
     setAnchorEl(event.currentTarget);
@@ -49,16 +61,19 @@ const Header = () => {
               <Link className={styles.navLink} to="/ourLocation">
                 Наши магазины
               </Link>
-
-              <Link className={styles.navLink} to="/admin">
-                Админ панель
-              </Link>
+              {
+                user ? user.role === "admin" ? (
+                  <Link className={styles.navLink} to="/admin">
+                    Админ панель
+                  </Link>
+                ) : null : null
+              }
             </Typography>
             {
               user ? (
                 <Toolbar>
                   <div>
-                    <CartButton className={styles.cart} badgeContent={2}/>
+                    <CartButton className={styles.cart} badgeContent={cart.books.length} onClick={handleModalOpen}/>
                   </div>
 
                   <div>
@@ -96,6 +111,8 @@ const Header = () => {
           </Toolbar>
         </Toolbar>
       </AppBar>
+
+      <CartModal open={modalOpen} onClose={handleModalClose}/>
     </>
   );
 };
