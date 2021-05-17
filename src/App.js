@@ -1,5 +1,5 @@
-import React from "react";
-import {BrowserRouter as Router, Route, Switch,} from "react-router-dom";
+import React, {useContext} from "react";
+import {Route, Switch} from "react-router-dom";
 import {Box, Container, CssBaseline} from "@material-ui/core";
 import Header from "./Components/Header/Header";
 import Home from "./Components/Home/Home";
@@ -10,10 +10,13 @@ import Authorization from "./Components/Authorization/Authorization";
 import AdminPanel from "./Components/AdminPanel/AdminPanel";
 import Checkout from "./Components/Checkout/Checkout";
 import NoMatch from "./Components/NoMatch/NoMatch";
+import {DataContext} from "./Context/DataContext";
 
 function App() {
+  const {AuthedUser} = useContext(DataContext);
+  const [user] = AuthedUser;
   return (
-    <Router>
+    <>
       <CssBaseline/>
       <Header/>
       <Container maxWidth={false}>
@@ -34,9 +37,14 @@ function App() {
             <Route path="/authorization">
               <Authorization/>
             </Route>
-            <Route path="/admin">
-              <AdminPanel/>
-            </Route>
+            {
+              user ? user.role === "admin" ? (
+                <Route path="/admin">
+                  <AdminPanel/>
+                </Route>
+              ) : null : null
+            }
+
             <Route path="/checkout">
               <Checkout/>
             </Route>
@@ -46,7 +54,7 @@ function App() {
           </Switch>
         </Box>
       </Container>
-    </Router>
+    </>
   );
 }
 

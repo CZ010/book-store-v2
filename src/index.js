@@ -6,6 +6,7 @@ import {IconButton, StylesProvider} from "@material-ui/core";
 import {SnackbarProvider} from "notistack";
 import HighlightOffIcon from "@material-ui/icons/HighlightOff";
 import {DataProvider} from "./Context/DataContext";
+import {BrowserRouter as Router} from "react-router-dom";
 
 const notistackRef = React.createRef();
 const onClickDismiss = key => () => {
@@ -23,7 +24,9 @@ ReactDOM.render(
       )}
     >
       <DataProvider>
-        <App/>
+        <Router>
+          <App/>
+        </Router>
       </DataProvider>
     </SnackbarProvider>
   </StylesProvider>,
