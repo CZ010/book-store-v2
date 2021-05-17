@@ -43,6 +43,7 @@ export const setUserDocument = async (data) => {
     }).catch((error) => {
       console.error("Error writing document: ", error);
     });
+    await createUsersCart(ID, createDate);
     return "Пользователь успешно добавлен!";
   } else {
     throw new Error("Пользователь с такой почтой уже существует!");
@@ -143,4 +144,84 @@ export const getProductsCollection = async () => {
   products.sort((a, b) => (a.createDate < b.createDate) ? 1
     : ((b.createDate < a.createDate) ? -1 : 0));
   return products;
+};
+
+export const getProductsByCategory = async (categoryId) => {
+  const categories = await getCategoriesCollection();
+  const productsRef = await db.collection("products")
+    .where("category", "==", categoryId).get();
+  const products = productsRef.docs.map(doc => {
+    const product = doc.data();
+    product.category = categories.find(x => x.id === product.category);
+    return product;
+  });
+  products.sort((a, b) => (a.createDate < b.createDate) ? 1
+    : ((b.createDate < a.createDate) ? -1 : 0));
+  return products;
+};
+
+export const createUsersCart = async (userID, createDate) => {
+  const ID = uuid();
+  db.collection("carts").doc(ID).set({
+    id: ID,
+    user: userID,
+    books: [],
+    createDate: createDate,
+    lastUpdateDate: createDate
+  }).then(() => {
+    console.log("Cart successfully added!");
+  }).catch((error) => {
+    console.error("Error writing document: ", error);
+  });
+};
+
+export const getUserCart = async (userID) => {
+  const books = await getProductsCollection();
+  const cartsRef = await db.collection("carts")
+    .where("user", "==", userID).get();
+  const carts = cartsRef.docs.map(doc => {
+    const cart = doc.data();
+    cart.books = cart.books.map(bookID => {
+      const bookIndex = books.findIndex(element => element.id === bookID);
+      return books[bookIndex];
+    });
+    return cart;
+  });
+  return carts[0];
+};
+
+export const getUserCartArray = async (userID) => {
+  const cartsRef = await db.collection("carts")
+    .where("user", "==", userID).get();
+  const carts = cartsRef.docs.map(doc => doc.data());
+  return carts[0];
+};
+
+export const updateUserCart = async (userID, bookID) => {
+  const cart = await getUserCartArray(userID);
+  const books = cart.books.slice();
+  books.push(bookID);
+
+  const cartRef = await db.collection("carts").doc(cart.id);
+  cartRef.update({
+    books: books
+  }).then(() => {
+    console.log("Document successfully updated!");
+  }).catch((error) => {
+    console.error("Error updating document: ", error);
+  });
+};
+
+export const removeBookFromUserCart = async (userID, bookID) => {
+  const cart = await getUserCartArray(userID);
+  const books = cart.books.filter(x => x !== bookID);
+
+  const cartRef = await db.collection("carts").doc(cart.id);
+  cartRef.update({
+    books: books
+  }).then(() => {
+    console.log("Document successfully updated!");
+  }).catch((error) => {
+    console.error("Error updating document: ", error);
+  });
 };
