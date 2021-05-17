@@ -1,18 +1,16 @@
-import firebase from 'firebase/app';
-import 'firebase/firestore';
-import 'firebase/storage';
+import firebase from "firebase/app";
+import "firebase/firestore";
+import "firebase/storage";
 
-const config = {
-  apiKey: "AIzaSyCCWk4OmtXb1jeYn3taLMeDFUEUI-1VdUc",
-  authDomain: "fir-test-project-1-636f2.firebaseapp.com",
-  databaseURL: "https://fir-test-project-1-636f2-default-rtdb.firebaseio.com",
-  projectId: "fir-test-project-1-636f2",
-  storageBucket: "fir-test-project-1-636f2.appspot.com",
-  messagingSenderId: "112152366163",
-  appId: "1:112152366163:web:60e1764aae5901d7688aa6",
-  measurementId: "G-LN44ZY2K9F"
+const firebaseConfig = {
+  apiKey: "AIzaSyAkc5ij2WFcrEAg4h-AINAgjanG6GtMn4U",
+  authDomain: "book-store-1-a9fcc.firebaseapp.com",
+  projectId: "book-store-1-a9fcc",
+  storageBucket: "book-store-1-a9fcc.appspot.com",
+  messagingSenderId: "626302651085",
+  appId: "1:626302651085:web:7c05e88549f36911a03784"
 };
 
-firebase.initializeApp(config);
+firebase.initializeApp(firebaseConfig);
 
 export default firebase;
