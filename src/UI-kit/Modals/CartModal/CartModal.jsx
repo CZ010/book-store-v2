@@ -53,13 +53,13 @@ const CartModal = ({open, onClose}) => {
           <List className={styles.list}>
             {cart.books.map((book) => {
               return (
-                <ListItem key={book.id} className={styles.listItem}>
+                <ListItem key={book.book.id} className={styles.listItem}>
                   <Paper className={styles.listItemBox}>
                     <div className={styles.listItemImg}>
                       <img
                         style={{width: "60px"}}
-                        src={book.image}
-                        alt={book.title}
+                        src={book.book.image}
+                        alt={book.book.title}
                       />
                     </div>
                     <div className={styles.listItemInfo}>
@@ -69,19 +69,19 @@ const CartModal = ({open, onClose}) => {
                           variant="h6"
                           noWrap
                         >
-                          {book.title}
+                          {book.book.title}
                         </Typography>
                       </div>
-                      <div>{book.author}</div>
+                      <div>{book.book.author}</div>
                       <div>
                         <Typography variant="subtitle2">
-                          {book.price} сом
+                          {book.book.price} сом
                         </Typography>
                       </div>
                     </div>
                     <div>
                       <IconButton onClick={() => {
-                        handleRemoveFromCartClick(book.id);
+                        handleRemoveFromCartClick(book.book.id);
                       }}>
                         <DeleteIcon/>
                       </IconButton>
