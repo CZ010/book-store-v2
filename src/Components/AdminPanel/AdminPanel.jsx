@@ -8,6 +8,7 @@ import Categories from "./Categories/Categories";
 import AddCategory from "./Categories/AddCategory";
 import Products from "./Products/Products";
 import AddProduct from "./Products/AddProduct";
+import Orders from "./Orders/Orders";
 
 const AdminPanel = () => {
   const {path, url} = useRouteMatch();
@@ -21,7 +22,7 @@ const AdminPanel = () => {
         <Grid item xs={9}>
           <Switch>
             <Route exact path={path}>
-              {<h3 style={{height: "1500px"}}>DashBoard</h3>}
+              {<h3 style={{height: "1500px"}}></h3>}
             </Route>
 
             <Route path={`${path}/addUser`}>
@@ -46,6 +47,10 @@ const AdminPanel = () => {
 
             <Route path={`${path}/AddProduct`}>
               <AddProduct/>
+            </Route>
+
+            <Route path={`${path}/Orders`}>
+              <Orders/>
             </Route>
 
             <Redirect to="/error"/>
