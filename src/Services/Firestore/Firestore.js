@@ -4,6 +4,14 @@ import {v4 as uuid} from "uuid";
 const db = firebase.firestore();
 const storage = firebase.storage();
 
+const getSum = (cart) => {
+  let sum = 0;
+  for (const book of cart) {
+    sum += Number.parseInt(book.book.price) * Number.parseInt(book.quantity);
+  }
+  return sum;
+};
+
 export const getUsersCollection = async () => {
   const roles = await getRolesCollection();
   const usersRef = await db.collection("users").get();
@@ -183,7 +191,8 @@ export const getUserCart = async (userID) => {
     const cart = doc.data();
     cart.books = cart.books.map(bookID => {
       const bookIndex = books.findIndex(element => element.id === bookID);
-      return books[bookIndex];
+      const newBooks = books[bookIndex];
+      return {book: newBooks, quantity: 1};
     });
     return cart;
   });
@@ -224,4 +233,57 @@ export const removeBookFromUserCart = async (userID, bookID) => {
   }).catch((error) => {
     console.error("Error updating document: ", error);
   });
+};
+
+export const setOrderDocument = async (data) => {
+  const sum = getSum(data.books);
+  const order = {
+    id: data.id,
+    createDate: data.createDate,
+    books: data.books.map(element => {
+      return {book: element.book.id, quantity: element.quantity};
+    }),
+    user: data.user,
+    sum: sum,
+    status: false
+  };
+
+  for (const item of data.books) {
+    const cartRef = await db.collection("products").doc(item.book.id);
+    cartRef.update({
+      count: item.book.count - item.quantity
+    }).then(() => {
+      console.log("Document successfully updated!");
+    }).catch((error) => {
+      console.error("Error updating document: ", error);
+    });
+  }
+
+
+  db.collection("orders").doc(data.id).set(order).then(() => {
+    console.log("Order successfully added!");
+  }).catch((error) => {
+    console.error("Error writing document: ", error);
+  });
+  return "Ваш заказ успешно оформлен!";
+};
+
+export const getOrdersCollection = async () => {
+  const books = await getProductsCollection();
+  const users = await getUsersCollection();
+
+  const ordersRef = await db.collection("orders").get();
+  const orders = ordersRef.docs.map(doc => {
+    const order = doc.data();
+    order.books = order.books.map(element => {
+      element.book = books.find(x => x.id === element.book);
+      return element;
+    });
+    order.user = users.find(x => x.id === order.user);
+
+    return order;
+  });
+  orders.sort((a, b) => (a.createDate < b.createDate) ? 1
+    : ((b.createDate < a.createDate) ? -1 : 0));
+  return orders;
 };
