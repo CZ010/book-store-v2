@@ -44,10 +44,13 @@ function App() {
                 </Route>
               ) : null : null
             }
-
-            <Route path="/checkout">
-              <Checkout/>
-            </Route>
+            {
+              user ? (
+                <Route path="/checkout">
+                  <Checkout/>
+                </Route>
+              ) : null
+            }
             <Route path="*">
               <NoMatch/>
             </Route>
