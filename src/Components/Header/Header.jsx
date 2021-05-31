@@ -5,7 +5,8 @@ import {CartButton, UserButton} from "../../UI-kit/Buttons";
 import {UserMenu} from "../../UI-kit/Menus";
 import {DataContext} from "../../Context/DataContext";
 import CartModal from "../../UI-kit/Modals/CartModal/CartModal";
-
+import {useHistory} from "react-router-dom";
+  
 const Header = () => {
   const styles = useStyles();
   const [anchorEl, setAnchorEl] = useState(null);
@@ -14,6 +15,7 @@ const Header = () => {
   const [user] = AuthedUser;
   const [logout] = Logout;
   const [cart] = ShoppingCart;
+  const history = useHistory();
 
   const [modalOpen, setModalOpen] = useState(false);
 
@@ -31,6 +33,11 @@ const Header = () => {
 
   const handleMenuClose = () => {
     setAnchorEl(null);
+  };
+
+  const handleLogout = () => {
+    logout();
+    history.push("/shop");
   };
 
   return (
@@ -81,9 +88,7 @@ const Header = () => {
                     <UserMenu anchorEl={anchorEl}
                               open={open}
                               onClose={handleMenuClose}
-                              logOut={() => {
-                                logout();
-                              }}
+                              logOut={handleLogout}
                     />
                   </div>
                 </Toolbar>
