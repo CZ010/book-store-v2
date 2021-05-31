@@ -7,6 +7,7 @@ import CategoryIcon from "@material-ui/icons/Category";
 import PlaylistAddIcon from "@material-ui/icons/PlaylistAdd";
 import InboxIcon from "@material-ui/icons/Inbox";
 import AddBoxIcon from "@material-ui/icons/AddBox";
+import StorageIcon from "@material-ui/icons/Storage";
 
 const SideBar = ({url}) => {
   const styles = useStyles();
@@ -66,6 +67,16 @@ const SideBar = ({url}) => {
               <Typography>
                 <Link className={styles.link} to={`${url}/AddProduct`}>
                   <AddBoxIcon className={styles.icon}/> Добавить товар
+                </Link>
+              </Typography>
+            </ListItemText>
+          </ListItem>
+          <Divider variant="fullWidth"/>
+          <ListItem className={styles.listItem}>
+            <ListItemText>
+              <Typography>
+                <Link className={styles.link} to={`${url}/Orders`}>
+                  <StorageIcon className={styles.icon}/> Заказы
                 </Link>
               </Typography>
             </ListItemText>
