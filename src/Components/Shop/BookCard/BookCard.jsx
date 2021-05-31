@@ -49,7 +49,7 @@ const BookCard = (book) => {
           </Typography>
         </div>
         <div className={styles.buttonsBox}>
-          {!cart.books.some((x) => x.id === book.id) ? (
+          {!cart.books.some((x) => x.book.id === book.id) ? (
             <Button
               variant="contained"
               className={styles.addToCart}
