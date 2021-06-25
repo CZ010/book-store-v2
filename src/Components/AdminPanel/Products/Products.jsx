@@ -3,10 +3,11 @@ import * as Firestore from "../../../Services/Firestore/Firestore";
 import {Table, ProductsRowDetail} from "../../../UI-kit/Tables";
 import {DataTypeProvider} from "@devexpress/dx-react-grid";
 import saveAs from "file-saver";
-import {Chip, makeStyles} from "@material-ui/core";
+import {Chip, Input, makeStyles, MenuItem, Select, Switch} from "@material-ui/core";
 
 const Products = () => {
   const styles = useStyles();
+  const [categories, setCategories] = useState([]);
   const [products, setProducts] = useState([]);
   const [columns] = useState([
     // {name: "id", title: "ID"},
@@ -36,14 +37,28 @@ const Products = () => {
   const [dateColumns] = useState(["createDate"]);
   const [priceColumns] = useState(["price"]);
   const [countColumns] = useState(["count"]);
+  const [categoryColumns] = useState(["category"]);
 
+  const [editingStateColumnExtensions] = useState([
+    {columnName: "createDate", editingEnabled: false},
+  ]);
 
   const statusFormatter = ({value}) => value ?
     (<Chip component={"span"} label={"Акивен"} className={styles.chip}/>) :
     (<Chip component={"span"} label={"Не активен"} color={"secondary"}/>);
+
+  const statusEditor = ({value, onValueChange}) => (
+    <Switch
+      checked={value}
+      onChange={event => onValueChange(event.target.checked)}
+      color={"primary"}
+    />
+  );
+
   const StatusTypeProvider = props => (
     <DataTypeProvider
       formatterComponent={statusFormatter}
+      editorComponent={statusEditor}
       {...props}
     />
   );
@@ -79,10 +94,44 @@ const Products = () => {
     />
   );
 
+  const categoryEditor = ({value, onValueChange}) => {
+
+    const elementsIndex = categories.findIndex(element => element.title === value);
+    let df = {...categories[elementsIndex]};
+
+    return <Select
+      input={<Input/>}
+      onChange={event => onValueChange({...categories[categories.findIndex(element => element.id === event.target.value)]})}
+      style={{width: "100%"}}
+      defaultValue={df.id}
+    >
+      {
+        categories.map(category => (
+          <MenuItem key={category.id} value={category.id}>
+            {category.title}
+          </MenuItem>
+        ))
+      }
+    </Select>;
+  };
+
+  const CategoryTypeProvider = props => (
+    <DataTypeProvider
+      editorComponent={categoryEditor}
+      {...props}
+    />
+  );
+
   useEffect(() => {
     Firestore.getProductsCollection().then(collection => {
       setProducts(collection);
       setLoading(false);
+    }).catch(error => {
+      console.error(error);
+    });
+
+    Firestore.getCategoriesCollection().then(collection => {
+      setCategories(collection);
     }).catch(error => {
       console.error(error);
     });
@@ -96,6 +145,31 @@ const Products = () => {
     workbook.xlsx.writeBuffer().then((buffer) => {
       saveAs(new Blob([buffer], {type: "application/octet-stream"}), "DataGrid.xlsx");
     });
+  };
+
+  const commitChanges = ({changed}) => {
+    let row;
+    let id;
+    for (const categoriesKey in products) {
+      if (changed[categoriesKey]) {
+        row = products[categoriesKey];
+        id = categoriesKey;
+      }
+    }
+
+    if (changed[id]) {
+      const changedRows = products.map(user => (row.id === user.id ? {...user, ...changed[id]} : user));
+      setProducts(changedRows);
+      console.log(changedRows[id]);
+      Firestore.updateDocument("products", row.id, {
+        id: changedRows[id].id,
+        title: changedRows[id].title,
+        createDate: changedRows[id].createDate,
+        status: changedRows[id].status
+      }).catch(error => {
+        console.error(error);
+      });
+    }
   };
 
   return (
@@ -113,11 +187,14 @@ const Products = () => {
       exporterRef={exporterRef}
       onSave={onSave}
       columnExtensions={tableColumnExtensions}
+      commitChanges={commitChanges}
+      editingStateColumnExtensions={editingStateColumnExtensions}
     >
       <StatusTypeProvider for={statusColumns}/>
       <DateTypeProvider for={dateColumns}/>
       <PriceTypeProvider for={priceColumns}/>
       <CountTypeProvider for={countColumns}/>
+      <CategoryTypeProvider for={categoryColumns}/>
     </Table>
   );
 };

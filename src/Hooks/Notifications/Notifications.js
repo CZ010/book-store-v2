@@ -1,14 +1,14 @@
-import {useSnackbar} from "notistack";
-import {Slide} from "@material-ui/core";
+import {useSnackbar} from 'notistack';
+import {Slide} from '@material-ui/core';
 
 export const useNotifications = () => {
   const {enqueueSnackbar} = useSnackbar();
   const Success = (message) => {
     enqueueSnackbar(message, {
-      variant: "success",
+      variant: 'success',
       anchorOrigin: {
-        vertical: "top",
-        horizontal: "right",
+        vertical: 'top',
+        horizontal: 'right',
       },
       TransitionComponent: Slide,
     });
@@ -16,10 +16,10 @@ export const useNotifications = () => {
 
   const Error = (message) => {
     enqueueSnackbar(message, {
-      variant: "error",
+      variant: 'error',
       anchorOrigin: {
-        vertical: "top",
-        horizontal: "right",
+        vertical: 'top',
+        horizontal: 'right',
       },
       TransitionComponent: Slide,
     });
@@ -27,10 +27,10 @@ export const useNotifications = () => {
 
   const Warning = (message) => {
     enqueueSnackbar(message, {
-      variant: "warning",
+      variant: 'warning',
       anchorOrigin: {
-        vertical: "top",
-        horizontal: "right",
+        vertical: 'top',
+        horizontal: 'right',
       },
       TransitionComponent: Slide,
     });

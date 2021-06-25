@@ -8,7 +8,7 @@ const SideBar = ({url}) => {
   const styles = useStyles();
   const [categories, setCategories] = useState([]);
   useEffect(() => {
-    Firestore.getCategoriesCollection().then(collection => {
+    Firestore.getActiveCategories().then(collection => {
       setCategories(collection);
     }).catch(error => {
       console.error(error);

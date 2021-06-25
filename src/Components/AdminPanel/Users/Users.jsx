@@ -1,6 +1,6 @@
 import React, {useCallback, useEffect, useRef, useState} from "react";
 import * as Firestore from "../../../Services/Firestore/Firestore";
-import {Chip, makeStyles} from "@material-ui/core";
+import {Chip, Input, makeStyles, MenuItem, Select, Switch} from "@material-ui/core";
 import {DataTypeProvider} from "@devexpress/dx-react-grid";
 import saveAs from "file-saver";
 import {Table, UserRowDetail} from "../../../UI-kit/Tables";
@@ -23,15 +23,31 @@ const Users = () => {
   const [selection, setSelection] = useState([]);
   const exporterRef = useRef(null);
   const [pageSizes] = useState([5, 10, 15, 0]);
+  const [roleColumns] = useState(["role"]);
   const [statusColumns] = useState(["status"]);
   const [dateColumns] = useState(["createDate"]);
+  const [editingStateColumnExtensions] = useState([
+    {columnName: "createDate", editingEnabled: false},
+  ]);
+  const [roles, setRoles] = useState([]);
 
-  const statusFormatter = ({value}) => value ?
+
+  const statusFormatter = ({value, row}) => value ?
     (<Chip component={"span"} label={"Акивен"} className={styles.chip}/>) :
     (<Chip component={"span"} label={"Не активен"} color={"secondary"}/>);
+
+  const statusEditor = ({value, onValueChange}) => (
+    <Switch
+      checked={value}
+      onChange={event => onValueChange(event.target.checked)}
+      color={"primary"}
+    />
+  );
+
   const StatusTypeProvider = props => (
     <DataTypeProvider
       formatterComponent={statusFormatter}
+      editorComponent={statusEditor}
       {...props}
     />
   );
@@ -51,6 +67,34 @@ const Users = () => {
     />
   );
 
+  const rolesEditor = ({value, onValueChange}) => {
+
+    const elementsIndex = roles.findIndex(element => element.title === value);
+    let df = {...roles[elementsIndex]};
+
+    return <Select
+      input={<Input/>}
+      onChange={event => onValueChange({...roles[roles.findIndex(element => element.id === event.target.value)]})}
+      style={{width: "100%"}}
+      defaultValue={df.id}
+    >
+      {
+        roles.map(role => (
+          <MenuItem key={role.id} value={role.id}>
+            {role.title}
+          </MenuItem>
+        ))
+      }
+    </Select>;
+  };
+
+  const RolesTypeProvider = props => (
+    <DataTypeProvider
+      editorComponent={rolesEditor}
+      {...props}
+    />
+  );
+
   useEffect(() => {
     Firestore.getUsersCollection().then(collection => {
       setUsers(collection);
@@ -58,6 +102,13 @@ const Users = () => {
     }).catch(error => {
       console.error(error);
     });
+
+    Firestore.getRolesCollection().then(collection => {
+      setRoles(collection);
+    }).catch(error => {
+      console.error("ERROR!!! => ", error);
+    });
+
   }, []);
 
   const startExport = useCallback((options) => {
@@ -69,6 +120,37 @@ const Users = () => {
       saveAs(new Blob([buffer], {type: "application/octet-stream"}), "DataGrid.xlsx");
     });
   };
+
+  const commitChanges = ({changed}) => {
+    let row;
+    let id;
+    for (const usersKey in users) {
+      if (changed[usersKey]) {
+        row = users[usersKey];
+        id = usersKey;
+      }
+    }
+
+    if (changed[id]) {
+      const changedRows = users.map(user => (row.id === user.id ? {...user, ...changed[id]} : user));
+      setUsers(changedRows);
+      console.log(changedRows[id]);
+      Firestore.updateDocument("users", row.id, {
+        id: changedRows[id].id,
+        name: changedRows[id].name,
+        address: changedRows[id].address,
+        phone: changedRows[id].phone,
+        email: changedRows[id].email,
+        password: changedRows[id].password,
+        role: changedRows[id].role.id,
+        createDate: changedRows[id].createDate,
+        status: changedRows[id].status
+      }).catch(error => {
+        console.error(error);
+      });
+    }
+  };
+
 
   return (
     <Table
@@ -84,9 +166,12 @@ const Users = () => {
       startExport={startExport}
       exporterRef={exporterRef}
       onSave={onSave}
+      commitChanges={commitChanges}
+      editingStateColumnExtensions={editingStateColumnExtensions}
     >
       <StatusTypeProvider for={statusColumns}/>
       <DateTypeProvider for={dateColumns}/>
+      <RolesTypeProvider for={roleColumns}/>
     </Table>
   );
 };

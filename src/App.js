@@ -11,6 +11,7 @@ import AdminPanel from "./Components/AdminPanel/AdminPanel";
 import Checkout from "./Components/Checkout/Checkout";
 import NoMatch from "./Components/NoMatch/NoMatch";
 import {DataContext} from "./Context/DataContext";
+import Registration from "./Components/Registration/Registration";
 
 function App() {
   const {AuthedUser} = useContext(DataContext);
@@ -51,6 +52,9 @@ function App() {
                 </Route>
               ) : null
             }
+            <Route path="/registration">
+              <Registration/>
+            </Route>
             <Route path="*">
               <NoMatch/>
             </Route>

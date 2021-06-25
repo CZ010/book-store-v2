@@ -1,6 +1,6 @@
 import React, {useCallback, useEffect, useRef, useState} from "react";
 import * as Firestore from "../../../Services/Firestore/Firestore";
-import {Chip, makeStyles} from "@material-ui/core";
+import {Chip, makeStyles, Switch} from "@material-ui/core";
 import {DataTypeProvider} from "@devexpress/dx-react-grid";
 import {Table, OrdersRowDetail} from "../../../UI-kit/Tables";
 import saveAs from "file-saver";
@@ -27,12 +27,26 @@ const Orders = () => {
   const [dateColumns] = useState(["createDate"]);
   const [sumColumns] = useState(["sum"]);
 
+  const [editingStateColumnExtensions] = useState([
+    {columnName: "createDate", editingEnabled: false},
+  ]);
+
   const statusFormatter = ({value}) => value ?
     (<Chip component={"span"} label={"Доставлено"} className={styles.chip}/>) :
     (<Chip component={"span"} label={"Не Доставлено"} color={"secondary"}/>);
+
+  const statusEditor = ({value, onValueChange}) => (
+    <Switch
+      checked={value}
+      onChange={event => onValueChange(event.target.checked)}
+      color={"primary"}
+    />
+  );
+
   const StatusTypeProvider = props => (
     <DataTypeProvider
       formatterComponent={statusFormatter}
+      editorComponent={statusEditor}
       {...props}
     />
   );
@@ -77,6 +91,31 @@ const Orders = () => {
     });
   };
 
+  const commitChanges = ({changed}) => {
+    let row;
+    let id;
+    for (const ordersKey in orders) {
+      if (changed[ordersKey]) {
+        row = orders[ordersKey];
+        id = ordersKey;
+      }
+    }
+
+    if (changed[id]) {
+      const changedRows = orders.map(user => (row.id === user.id ? {...user, ...changed[id]} : user));
+      setOrders(changedRows);
+      console.log(changedRows[id]);
+      // Firestore.updateDocument("products", row.id, {
+      //   id: changedRows[id].id,
+      //   title: changedRows[id].title,
+      //   createDate: changedRows[id].createDate,
+      //   status: changedRows[id].status
+      // }).catch(error => {
+      //   console.error(error);
+      // });
+    }
+  };
+
   return (
     <Table
       rows={orders}
@@ -91,6 +130,8 @@ const Orders = () => {
       startExport={startExport}
       exporterRef={exporterRef}
       onSave={onSave}
+      commitChanges={commitChanges}
+      editingStateColumnExtensions={editingStateColumnExtensions}
     >
       <StatusTypeProvider for={statusColumns}/>
       <DateTypeProvider for={dateColumns}/>

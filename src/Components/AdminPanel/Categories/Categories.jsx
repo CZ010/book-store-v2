@@ -3,7 +3,7 @@ import * as Firestore from "../../../Services/Firestore/Firestore";
 import {Table, CategoriesRowDetail} from "../../../UI-kit/Tables";
 import {DataTypeProvider} from "@devexpress/dx-react-grid";
 import saveAs from "file-saver";
-import {Chip, makeStyles} from "@material-ui/core";
+import {Chip, makeStyles, Switch} from "@material-ui/core";
 
 const Categories = () => {
   const styles = useStyles();
@@ -23,12 +23,26 @@ const Categories = () => {
   const [statusColumns] = useState(["status"]);
   const [dateColumns] = useState(["createDate"]);
 
+  const [editingStateColumnExtensions] = useState([
+    {columnName: "createDate", editingEnabled: false},
+  ]);
+
   const statusFormatter = ({value}) => value ?
     (<Chip component={"span"} label={"Акивен"} className={styles.chip}/>) :
     (<Chip component={"span"} label={"Не активен"} color={"secondary"}/>);
+
+  const statusEditor = ({value, onValueChange}) => (
+    <Switch
+      checked={value}
+      onChange={event => onValueChange(event.target.checked)}
+      color={"primary"}
+    />
+  );
+
   const StatusTypeProvider = props => (
     <DataTypeProvider
       formatterComponent={statusFormatter}
+      editorComponent={statusEditor}
       {...props}
     />
   );
@@ -67,6 +81,31 @@ const Categories = () => {
     });
   };
 
+  const commitChanges = ({changed}) => {
+    let row;
+    let id;
+    for (const categoriesKey in categories) {
+      if (changed[categoriesKey]) {
+        row = categories[categoriesKey];
+        id = categoriesKey;
+      }
+    }
+
+    if (changed[id]) {
+      const changedRows = categories.map(user => (row.id === user.id ? {...user, ...changed[id]} : user));
+      setCategories(changedRows);
+      console.log(changedRows[id]);
+      Firestore.updateDocument("categories", row.id, {
+        id: changedRows[id].id,
+        title: changedRows[id].title,
+        createDate: changedRows[id].createDate,
+        status: changedRows[id].status
+      }).catch(error => {
+        console.error(error);
+      });
+    }
+  };
+
   return (
     <Table
       rows={categories}
@@ -81,6 +120,8 @@ const Categories = () => {
       startExport={startExport}
       exporterRef={exporterRef}
       onSave={onSave}
+      commitChanges={commitChanges}
+      editingStateColumnExtensions={editingStateColumnExtensions}
     >
       <StatusTypeProvider for={statusColumns}/>
       <DateTypeProvider for={dateColumns}/>

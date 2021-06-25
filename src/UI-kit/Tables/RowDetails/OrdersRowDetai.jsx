@@ -35,7 +35,7 @@ export const OrdersRowDetail = ({row}) => {
                 <TableCell align="left">{row.quantity}</TableCell>
               </TableRow>
             ))}
-            <TableRow>
+            <TableRow key={"x"}>
               <TableCell colSpan={2} align="left"><b>Сумма</b></TableCell>
               <TableCell colSpan={4} align="left"><b>{row.sum} сом</b></TableCell>
             </TableRow>

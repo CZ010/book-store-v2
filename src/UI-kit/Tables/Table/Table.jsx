@@ -5,9 +5,10 @@ import {
   Grid, GroupingPanel, PagingPanel, SearchPanel,
   TableColumnVisibility, TableFilterRow, TableGroupRow,
   TableHeaderRow, TableRowDetail, TableSelection, Toolbar,
-  VirtualTable
+  VirtualTable, TableEditRow, TableEditColumn
 } from "@devexpress/dx-react-grid-material-ui";
 import {
+  EditingState,
   FilteringState, GroupingState,
   IntegratedFiltering, IntegratedGrouping, IntegratedPaging, IntegratedSelection,
   IntegratedSorting, PagingState, RowDetailState,
@@ -32,7 +33,9 @@ export const Table = ({
                         startExport,
                         exporterRef,
                         onSave,
-                        columnExtensions
+                        columnExtensions,
+                        editingStateColumnExtensions,
+                        commitChanges
                       }) => {
 
   const {
@@ -47,18 +50,24 @@ export const Table = ({
     FilterOperationsMessages
   } = Localization;
 
+
   return (
     <Paper elevation={3}>
       <Grid rows={rows} columns={columns}>
 
         {children}
 
+        <EditingState
+          onCommitChanges={commitChanges}
+          columnExtensions={editingStateColumnExtensions}
+        />
+
         <SortingState defaultSorting={[{columnName: "createDate", direction: "desc"}]}/>
         <IntegratedSorting/>
 
         <SearchState/>
-        <FilteringState defaultFilters={[]}/>
-        <IntegratedFiltering/>
+        {/*<FilteringState defaultFilters={[]}/>*/}
+        {/*<IntegratedFiltering/>*/}
 
         <PagingState defaultCurrentPage={0} defaultPageSize={pageSizes[0]}/>
         <IntegratedPaging/>
@@ -76,10 +85,16 @@ export const Table = ({
 
         <TableHeaderRow showSortingControls messages={TableHeaderRowMessage}/>
         <TableColumnVisibility/>
-        <TableFilterRow showFilterSelector messages={FilterOperationsMessages}/>
+        {/*<TableFilterRow showFilterSelector messages={FilterOperationsMessages}/>*/}
         <TableRowDetail contentComponent={rowDetail}/>
         <TableSelection showSelectAll/>
         <TableGroupRow/>
+        <TableEditRow/>
+        <TableEditColumn
+          showEditCommand
+          messages={TableEditColumnMessage}
+        />
+
 
         <PagingPanel pageSizes={pageSizes} messages={pagingPanelMessages}/>
 

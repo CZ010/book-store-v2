@@ -9,7 +9,8 @@ const AllBooks = () => {
 
   useEffect(() => {
     Firestore.getProductsCollection().then(collection => {
-      setProducts(collection);
+      const prods = collection.filter(element => element.category.status);
+      setProducts(prods);
     }).catch(error => {
       console.error(error);
     });

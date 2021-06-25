@@ -61,7 +61,8 @@ export const setUserDocument = async (data) => {
 export const getUserByEmailAndPassword = async (data) => {
   const usersRef = await db.collection("users")
     .where("email", "==", data.email)
-    .where("password", "==", data.password).get();
+    .where("password", "==", data.password)
+    .where("status", "==", true).get();
   const users = usersRef.docs.map(doc => doc.data());
   return users[0];
 };
@@ -104,6 +105,15 @@ export const setCategoryDocument = async (data) => {
   } else {
     throw new Error("Такая категория уже существует!");
   }
+};
+
+export const getActiveCategories = async () => {
+  const categoriesRef = await db.collection("categories")
+    .where("status", "==", true).get();
+  const categories = categoriesRef.docs.map(doc => doc.data());
+  categories.sort((a, b) => (a.createDate < b.createDate) ? 1
+    : ((b.createDate < a.createDate) ? -1 : 0));
+  return categories;
 };
 
 export const getCategoriesCollection = async () => {
@@ -153,6 +163,7 @@ export const getProductsCollection = async () => {
     : ((b.createDate < a.createDate) ? -1 : 0));
   return products;
 };
+
 
 export const getProductsByCategory = async (categoryId) => {
   const categories = await getCategoriesCollection();
@@ -286,4 +297,15 @@ export const getOrdersCollection = async () => {
   orders.sort((a, b) => (a.createDate < b.createDate) ? 1
     : ((b.createDate < a.createDate) ? -1 : 0));
   return orders;
+};
+
+export const updateDocument = async (col, ID, changes) => {
+  const userRef = await db.collection(col).doc(ID);
+  userRef.update({
+    ...changes
+  }).then(() => {
+    console.log("Document successfully updated!");
+  }).catch((error) => {
+    console.error("Error updating document: ", error);
+  });
 };

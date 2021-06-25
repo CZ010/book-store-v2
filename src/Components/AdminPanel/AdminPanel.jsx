@@ -22,7 +22,7 @@ const AdminPanel = () => {
         <Grid item xs={9}>
           <Switch>
             <Route exact path={path}>
-              {<h3 style={{height: "1500px"}}></h3>}
+              {<h3></h3>}
             </Route>
 
             <Route path={`${path}/addUser`}>
